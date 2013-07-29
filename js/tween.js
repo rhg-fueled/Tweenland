@@ -148,7 +148,7 @@ function relationship(_geneticData)
 
 			if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
 				{
-					//document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
+					document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
 					_freq[i]++;  
 					_visited[i] = _visited [j] = 1 ;
 
@@ -181,9 +181,8 @@ function relationship(_geneticData)
 	{
 		for (var j=0; j<600; j++)
 		{
-			
 				var _diff = compareArrays( _geneticData[ _map[i][_thisCount] ], _geneticData[j] ).length;
-			    if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
+			    if( _diff >= _lowerLimit  &&  _diff <= _upperLimit && _map[i][0] != j )
 					{
 						_thisCount++;
 						_map[i][_thisCount] = j ;	
@@ -208,7 +207,7 @@ function relationship(_geneticData)
 
 
 	//---to check if all the tweens have been visited !
-	
+
 	// for (var i=0; i<600; i++)
 	// {
 	// 	document.write(_visited[i]);
