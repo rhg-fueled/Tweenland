@@ -121,37 +121,107 @@ function minmax(_geneticData)
 function relationship(_geneticData)
 {
 	var _count = 0 ;
-	var _upperLimit = 150;
-	var _lowerLimit = 90;
+	var _upperLimit = 147;
+	var _lowerLimit =91;
 	var _sum = 0;
+	var _visited = new Array();
+	var _freq = new Array();
+	var _leaf = new Array();
+	var _leafCount = 0 ;
+	var _map = new Array();
 
 	document.write("</br>Genetic bit difference between : " + _upperLimit + " & " + _lowerLimit + "</br>");
 	
 	for (var i=0; i<600; i++)
+		_visited[i] = 0 ;
+
+	for (var i=0; i<600; i++)
+		_freq[i] = 0 ;
+
+
+
+	for (var i=0; i<600; i++)
 	{
-		for (var j=i; j<600; j++)
+		for (var j=0; j<600; j++)
 		{
 			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
 
 			if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
 				{
-					document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
-					_count++;
-					_sum += _diff;
+					//document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
+					_freq[i]++;  
+					_visited[i] = _visited [j] = 1 ;
+
 				} 
 		}
 		
-		if (_count != 0)  //  so that it doesn't display NaN
+		if (_freq[i] == 1)
 		{
-			var _avg = _sum/_count;
-			document.write("Average : " + _avg + "</br>" + "</br >");
-		}	
-		_count = 0;
-		_sum = 0;
-
+			_leaf[_leafCount++] = i ;	
+		}
 	}
 
+	for (var i=0; i<_leafCount; i++)
+	 	_map[i] =  new Array(10);
+
+	for (var i=0; i<_leafCount; i++)
+	 	_map[i][0] =  _leaf[i];
+
+
+	 for (var i=0; i<_leafCount; i++)
+		for (var j=1; j<10; j++)
+				_map[i][j] = 0 ;
+	 
+
+	
+	var _thisCount = 0;
+
+
+	for (var i=0 ; i<_leafCount; i++)
+	{
+		for (var j=0; j<600; j++)
+		{
+			
+				var _diff = compareArrays( _geneticData[ _map[i][_thisCount] ], _geneticData[j] ).length;
+			    if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
+					{
+						_thisCount++;
+						_map[i][_thisCount] = j ;	
+					}
+			
+		}
+		_thisCount = 0 ;
+	}
+
+	
+	for (var i=0; i<_leafCount; i++)
+	 {
+	 	for (var j=0; j<10; j++)
+	 	{
+	 		document.write(_map[i][j] + " : ");
+	 	}
+	 	document.write("</br>");
+	 }
+
+	
+
+
+
+	//---to check if all the tweens have been visited !
+	
+	// for (var i=0; i<600; i++)
+	// {
+	// 	document.write(_visited[i]);
+	// 	if( !(_visited[i]) )
+	// 		document.write("</br>");
+	// }
+
+	 // for (var i=0; i<_leafCount; i++)
+	 // 	document.write( _leaf[i] + " , " );
+
 }
+
+
 
 function main()
 {
