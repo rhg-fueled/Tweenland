@@ -78,49 +78,49 @@ function compareArrays(source, target, print) {
 	
 }
 
-////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+///////------------------------------MY CODE---------------------------//////
+/////////////////////////////////////////////////////////////////////////////
 
-
-function main()
+function calculateDiff(_geneticData)
 {
+	for(var i=0; i<600; i++)
+	{
+		var _diff = compareArrays(_geneticData[0], _geneticData[i]);
+		document.write( "( 0,  " + i + " )" + " : " + _diff.length + "</br>");
+	}
+}
 
-	filename = "tweens600.txt";
-	var a = loadFileIntoArray(filename);
-	var _count = 0 ;
-	
+function minmax(_geneticData)
+{
 	 var max = 0 ; 
 	 var min = 1000 ;
-	
-	// document.write("Difference in genetic bits: </br>" );
-	
-	// for(var i=0; i<600; i++)
-	// {
-	// 	var d = compareArrays(a[0], a[i]);
-	// 	//document.write(d.length);
-	// 	document.write( "( 0,  " + i + " )" + " : " + d.length + "</br>");
-	// }
-
-		// for (var i=0; i<600; i++)
-		// {
-		// 	for (var j=i+1; j<600; j++)
-		// 	{
-				
-		// 		if( max < ( compareArrays(a[i], a[j]) ).length)
-		// 			{
-		// 				max = compareArrays(a[i], a[j]).length;
-		// 				//document.write(max);
-		// 			}
-
-		// 		if (min > (compareArrays( a[i], a[j]) ).length)
-		// 			{
-		// 				min = compareArrays( a[i], a[j] ).length;
-		// 				//document.write(min);
-		// 			}
-		// 	}
-		// }
 		
-		// document.write("max: " + max + " , " + " min: " + min);
-	
+		for (var i=0; i<600; i++)
+		 {
+			for (var j=i+1; j<600; j++)
+			{
+				
+				if( max < ( compareArrays(_geneticData[i], _geneticData[j]) ).length)
+					{
+						max = compareArrays(_geneticData[i], _geneticData[j]).length;
+						//document.write(max);
+					}
+
+				if (min > (compareArrays( _geneticData[i], _geneticData[j]) ).length)
+					{
+						min = compareArrays( _geneticData[i], _geneticData[j] ).length;
+						//document.write(min);
+					}
+			}
+		 } 
+		
+		document.write("max: " + max + " , " + " min: " + min);
+}
+
+function relationship(_geneticData)
+{
+	var _count = 0 ;
 	var _upperLimit = 150;
 	var _lowerLimit = 90;
 	var _sum = 0;
@@ -131,7 +131,7 @@ function main()
 	{
 		for (var j=i; j<600; j++)
 		{
-			var _diff = compareArrays( a[i], a[j] ).length;
+			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
 
 			if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
 				{
@@ -151,9 +151,15 @@ function main()
 
 	}
 
-	// var _avg = _sum/_count;
-	// document.write("</br> Count:  " + _count + "</br>");
-	// document.write("</br> Average: " + _avg);
+}
+
+function main()
+{
+
+	filename = "tweens600.txt";
+	var _geneticData = loadFileIntoArray(filename);
+	
+	relationship (_geneticData);
 
 	return 0;
 }
