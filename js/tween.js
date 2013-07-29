@@ -82,13 +82,29 @@ function compareArrays(source, target, print) {
 ///////------------------------------MY CODE---------------------------//////
 /////////////////////////////////////////////////////////////////////////////
 
-function calculateDiff(_geneticData)
+function calculateDiff(_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount, _leaf, _visited)
 {
-	for(var i=0; i<600; i++)
+	for (var i=0; i<600; i++)
 	{
-		var _diff = compareArrays(_geneticData[0], _geneticData[i]);
-		document.write( "( 0,  " + i + " )" + " : " + _diff.length + "</br>");
+		for (var j=0; j<600; j++)
+		{
+			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
+
+			if( _diff >= _lowerLimit   &&  _diff <= _upperLimit )
+				{
+					document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
+					_freq[i]++;  
+					_visited[i] = _visited [j] = 1 ;
+					
+				} 
+		}
+		
+		if (_freq[i] == 1)
+		{
+			_leaf[_leafCount++] = i ;	
+		}
 	}
+	return _leafCount;
 }
 
 function minmax(_geneticData)
@@ -115,51 +131,12 @@ function minmax(_geneticData)
 			}
 		 } 
 		
-		document.write("max: " + max + " , " + " min: " + min);
+	document.write("max: " + max + " , " + " min: " + min);
 }
 
-function relationship(_geneticData)
+
+function initMap(_leafCount, _map, _leaf)
 {
-	var _count = 0 ;
-	var _upperLimit = 147;
-	var _lowerLimit =91;
-	var _sum = 0;
-	var _visited = new Array();
-	var _freq = new Array();
-	var _leaf = new Array();
-	var _leafCount = 0 ;
-	var _map = new Array();
-
-	document.write("</br>Genetic bit difference between : " + _upperLimit + " & " + _lowerLimit + "</br>");
-	
-	for (var i=0; i<600; i++)
-		_visited[i] = 0 ;
-
-	for (var i=0; i<600; i++)
-		_freq[i] = 0 ;
-
-
-
-	for (var i=0; i<600; i++)
-	{
-		for (var j=0; j<600; j++)
-		{
-			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
-
-			if( _diff >= _lowerLimit  &&  _diff <= _upperLimit )
-				{
-					document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
-					_freq[i]++;  
-					_visited[i] = _visited [j] = 1 ;
-
-				} 
-		}
-		
-		if (_freq[i] == 1)
-		{
-			_leaf[_leafCount++] = i ;	
-		}
-	}
 
 	for (var i=0; i<_leafCount; i++)
 	 	_map[i] =  new Array(10);
@@ -172,54 +149,94 @@ function relationship(_geneticData)
 		for (var j=1; j<10; j++)
 				_map[i][j] = 0 ;
 	 
+	// document.write("Inside initMap");
+}
 
-	
-	var _thisCount = 0;
 
 
+function findParent( _leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount )
+{
 	for (var i=0 ; i<_leafCount; i++)
 	{
 		for (var j=0; j<600; j++)
 		{
-				var _diff = compareArrays( _geneticData[ _map[i][_thisCount] ], _geneticData[j] ).length;
+				var _diff = compareArrays( _geneticData[ _map[i][0] ], _geneticData[j] ).length;
 			    if( _diff >= _lowerLimit  &&  _diff <= _upperLimit && _map[i][0] != j )
 					{
 						_thisCount++;
 						_map[i][_thisCount] = j ;	
 					}
-			
 		}
 		_thisCount = 0 ;
 	}
 
+	//document.write("Inside findParent");
+}
+
+
+function displayMap(_leafCount, _map)
+{
 	
 	for (var i=0; i<_leafCount; i++)
 	 {
+	 	
 	 	for (var j=0; j<10; j++)
 	 	{
 	 		document.write(_map[i][j] + " : ");
 	 	}
 	 	document.write("</br>");
 	 }
+	//document.write("Inside displayMap");
 
-	
-
-
-
-	//---to check if all the tweens have been visited !
-
-	// for (var i=0; i<600; i++)
-	// {
-	// 	document.write(_visited[i]);
-	// 	if( !(_visited[i]) )
-	// 		document.write("</br>");
-	// }
-
-	 // for (var i=0; i<_leafCount; i++)
-	 // 	document.write( _leaf[i] + " , " );
-
+	for (var i=0 ; i<_leafCount; i++)
+	{
+		for (var j=0; j<_leafCount; j++)
+		{
+			if(i!=j)
+			{	
+				if(_map[i][1] == _map[j][1])
+				{
+					document.write(_map[i][0] + " : " + _map[j][0] + " ( " + _map[i][1] + " ) " + " , ");
+				}
+			}
+		}
+		document.write("</br>---Next----</br>");
+		_thisCount = 0 ;
+	}
 }
 
+
+
+function relationship(_geneticData)
+{
+	var _count = 0 ;
+	var _upperLimit = 147;
+	var _lowerLimit =91;
+	var _sum = 0;
+	var _visited = new Array();
+	var _freq = new Array();
+	var _leaf = new Array();
+	var _leafCount = 0 ;
+	var _map = new Array();
+	var _thisCount = 0;
+
+	document.write("</br>Genetic bit difference between : " + _upperLimit + " & " + _lowerLimit + "</br>");
+	
+	for (var i=0; i<600; i++)
+	{
+		_visited[i] = 0 ;
+		_freq[i] = 0 ;
+	}
+		
+	 _leafCount = calculateDiff (_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount, _leaf, _visited);
+	
+	initMap(_leafCount, _map, _leaf);
+	
+	findParent (_leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount );
+	
+	displayMap (_leafCount, _map);	
+	
+}
 
 
 function main()
@@ -246,6 +263,19 @@ main();
 
 
 
+
+
+	//---to check if all the tweens have been visited !
+
+	// for (var i=0; i<600; i++)
+	// {
+	// 	document.write(_visited[i]);
+	// 	if( !(_visited[i]) )
+	// 		document.write("</br>");
+	// }
+
+	 // for (var i=0; i<_leafCount; i++)
+	 // 	document.write( _leaf[i] + " , " );
 
 
 
