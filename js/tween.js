@@ -82,7 +82,26 @@ function compareArrays(source, target, print) {
 ///////------------------------------MY CODE---------------------------//////
 /////////////////////////////////////////////////////////////////////////////
 
-function calculateDiff(_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount, _leaf, _visited)
+filename = "tweens600.txt";
+filename_small = "smallTweens.txt";
+var _geneticData = loadFileIntoArray(filename);
+var _relationshipMap = new Array();
+var _count = 0 ;
+var _upperLimit = 147;
+var _lowerLimit =91;
+var _sum = 0;
+var _visited = new Array();
+var _freq = new Array();
+var _leaf = new Array();
+var _leafCount = 0 ;
+var _genLength  = _geneticData.length;
+var _genLengthFreq = _genLength;
+var _parentIndex = new Array();
+var _freqSum = 0;
+var _currentParent = 0;
+var _true = 2;
+
+function calculateDiff()
 {
 	for (var i=0; i<600; i++)
 	{
@@ -104,6 +123,7 @@ function calculateDiff(_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount
 			_leaf[_leafCount++] = i ;	
 		}
 	}
+
 	return _leafCount;
 }
 
@@ -179,7 +199,6 @@ function displayMap(_leafCount, _map)
 	
 	for (var i=0; i<_leafCount; i++)
 	 {
-	 	
 	 	for (var j=0; j<10; j++)
 	 	{
 	 		document.write(_map[i][j] + " : ");
@@ -209,16 +228,6 @@ function displayMap(_leafCount, _map)
 
 function relationship(_geneticData)
 {
-	var _count = 0 ;
-	var _upperLimit = 147;
-	var _lowerLimit =91;
-	var _sum = 0;
-	var _visited = new Array();
-	var _freq = new Array();
-	var _leaf = new Array();
-	var _leafCount = 0 ;
-	var _map = new Array();
-	var _thisCount = 0;
 
 	document.write("</br>Genetic bit difference between : " + _upperLimit + " & " + _lowerLimit + "</br>");
 	
@@ -229,61 +238,175 @@ function relationship(_geneticData)
 	}
 		
 	 _leafCount = calculateDiff (_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount, _leaf, _visited);
+	 document.write("_leafCount: " + _leafCount);
 	
-	initMap(_leafCount, _map, _leaf);
+	//initMap(_leafCount, _map, _leaf);
 	
-	findParent (_leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount );
+	//findParent (_leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount );
 	
-	displayMap (_leafCount, _map);	
+	//displayMap (_leafCount, _map);	
 	
 }
 
+function toCreateSmallerTweens(_geneticData)
+{
+
+	var _smallTweens =  new Array();
+	var _items = new Array();
+	_items = [0,4,58,208,211,369,447,514];
+
+	for (var i=0; i<_items.length; i++)
+	{
+		_smallTweens[i] = _geneticData[_items[i]];
+	}
+
+	for (var i=0; i<_items.length; i++)
+	{
+		document.write( " _smallTweens [ " + _items[i] + " ] : " + _smallTweens[i] ); 
+	}
+
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+///////--------------------------Differenct Attempt--------------------//////
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+function initFunctions(){
+	for(var i=0; i<_genLength; i++){
+	 	_freq[i] = 0 ;
+	 	_parentIndex[i]= 0;
+	}
+}
+
+function freqSum(){
+	_freqSum = 0 ;
+	for(var i=0; i<_genLength; i++)
+		_freqSum += _relationshipMap[i][_genLengthFreq];
+}
+
+	
+function initRelatationMap(){
+	
+	for (var i=0; i< _genLength; i++){
+		_relationshipMap[i] = [];
+
+		for(var j=0; j< _genLength+2; j++){
+			_relationshipMap[i][j] = 0 ;
+		}
+	}
+}
+
+
+function displayRelationshipMap(){
+	for(var i=0; i<_genLength; i++){
+		for(var j=0; j<_genLength+2; j++){
+		   document.write( _relationshipMap[i][j] );
+		}
+	document.write( "</br>" );
+	}
+}
+
+function fillMapWithDiff()
+{
+	for (var i=0; i<_genLength; i++){
+		for (var j=0; j<_genLength; j++){
+			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
+
+			if( _diff >= _lowerLimit   &&  _diff <= _upperLimit ){
+					
+					_relationshipMap[i][j] = _diff;
+					++(_relationshipMap[i][_genLengthFreq]);
+					++_freq[i];
+					_currentParent = j;
+				} 
+		}
+		
+		if(_freq[i] == 1)
+			_parentIndex[i] = _currentParent; 	
+	}
+}
+
+function refreshParentIndex(){
+	initFunctions();
+	for(var i=0; i<_genLength; i++){
+		if(_relationshipMap[i][_genLengthFreq] == 1){
+			for(var j=0; j<_genLength; j++){
+				if(_relationshipMap[i][j] != 0)
+						_parentIndex[i] = j;
+			}
+		}
+		else
+			_parentIndex[i] = 0;	
+	}
+}
+
+function somethingHappens(){
+	document.write("</br></br>");
+	freqSum();
+	document.write("</br>" +  "_freqSum: " + _freqSum + "</br>");
+	displayFreq();
+
+	while(_freqSum > 2 ){
+				for (var i=0; i<_genLength; i++){
+
+					if(_relationshipMap[i][_genLengthFreq] == 1){
+						_relationshipMap[i][_parentIndex[i]] = 1 ;
+						_relationshipMap[i][_genLengthFreq] = 0;
+					}
+				}
+				
+				for(var i=0; i<_genLength; i++){
+
+					if(_parentIndex[i] != 0 ){
+						_relationshipMap[_parentIndex[i]][i] = 0;
+						--(_relationshipMap[_parentIndex[i]][_genLengthFreq]);
+					}
+				}
+				
+				freqSum();
+				document.write("</br>" +  "_freqSum: " + _freqSum + "</br>");
+				displayFreq();
+				--_true ; 
+				refreshParentIndex();
+			}
+}
+
+function displayFreq(){
+	for(var i=0; i<_genLength; i++){
+		document.write(_relationshipMap[i][_genLengthFreq] + " , ");
+		//document.write(_relationshipMap[i][_genLengthFreq] + " ( " + i + " ) " +  " , ");
+	}
+	document.write("</br></br>");
+}
+
+function displaySuperParent() {
+	 for(var i=0; i<_genLength; i++){
+	 	if(_relationshipMap[i][_genLengthFreq] != 0)
+	 		document.write("</br></br> SuperParent: " + i + " ( " + _relationshipMap[i][_genLengthFreq] + ")" );
+	 }	
+}
 
 function main()
 {
 
-	filename = "tweens600.txt";
-	var _geneticData = loadFileIntoArray(filename);
-	
-	relationship (_geneticData);
+	 initFunctions();		
+	 
+	 initRelatationMap();
+	 
+	 fillMapWithDiff();
+	 
+	 somethingHappens();
+	 
+	 displaySuperParent();
 
-	return 0;
+	 return 0;
 }
 
 main();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//---to check if all the tweens have been visited !
-
-	// for (var i=0; i<600; i++)
-	// {
-	// 	document.write(_visited[i]);
-	// 	if( !(_visited[i]) )
-	// 		document.write("</br>");
-	// }
-
-	 // for (var i=0; i<_leafCount; i++)
-	 // 	document.write( _leaf[i] + " , " );
-
-
-
-
-
-
-
-
 
 
 
