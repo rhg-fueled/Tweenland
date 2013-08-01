@@ -82,197 +82,21 @@ function compareArrays(source, target, print) {
 ///////------------------------------MY CODE---------------------------//////
 /////////////////////////////////////////////////////////////////////////////
 
-filename = "tweens600.txt";
-filename_small = "smallTweens.txt";
-var _geneticData = loadFileIntoArray(filename);
-var _relationshipMap = new Array();
-var _count = 0 ;
-var _upperLimit = 147;
-var _lowerLimit =91;
-var _sum = 0;
-var _visited = new Array();
-var _freq = new Array();
-var _leaf = new Array();
-var _leafCount = 0 ;
-var _genLength  = _geneticData.length;
-var _genLengthFreq = _genLength;
-var _parentIndex = new Array();
-var _freqSum = 0;
+var _filename = "tweens600.txt";
+var _geneticData = loadFileIntoArray(_filename); 	//---it stores genetic data of all the tweens
+var _relationshipMap = new Array();					//---it stores relationship information among all the tweens (0: not related, 1: parent node, some value greater than 1: related but not visited)
+var _upperLimit = 147;								//---upperlimit of the range of approximation in terms of number of different bits when cloned
+var _lowerLimit =91;								//---lowerlimit of the range of approximation in terms of number of different bits when cloned
+var _freq = new Array();							//---number of relations of a tween
+var _genLength  = _geneticData.length;				//---number of tweens
+var _genLengthFreq = _genLength;					//---its the 600th index of _relationshipMap that represents the number of relations
+var _parentIndex = new Array();						//---its an array which keeps info about parent of all the leaf node (i.e. node without any children); if index (i) has value 1 then its the parent otherwise not
+var _freqSum = 0;									//---it stores the sum of all the number of relatioships at every iteration in toFindParentList() function;
 var _currentParent = 0;
-var _true = 2;
-
-function calculateDiff()
-{
-	for (var i=0; i<600; i++)
-	{
-		for (var j=0; j<600; j++)
-		{
-			var _diff = compareArrays( _geneticData[i], _geneticData[j] ).length;
-
-			if( _diff >= _lowerLimit   &&  _diff <= _upperLimit )
-				{
-					document.write(i + " --> " + j + "   :   " + _diff + " (-) </br>");
-					_freq[i]++;  
-					_visited[i] = _visited [j] = 1 ;
-					
-				} 
-		}
-		
-		if (_freq[i] == 1)
-		{
-			_leaf[_leafCount++] = i ;	
-		}
-	}
-
-	return _leafCount;
-}
-
-function minmax(_geneticData)
-{
-	 var max = 0 ; 
-	 var min = 1000 ;
-		
-		for (var i=0; i<600; i++)
-		 {
-			for (var j=i+1; j<600; j++)
-			{
-				
-				if( max < ( compareArrays(_geneticData[i], _geneticData[j]) ).length)
-					{
-						max = compareArrays(_geneticData[i], _geneticData[j]).length;
-						//document.write(max);
-					}
-
-				if (min > (compareArrays( _geneticData[i], _geneticData[j]) ).length)
-					{
-						min = compareArrays( _geneticData[i], _geneticData[j] ).length;
-						//document.write(min);
-					}
-			}
-		 } 
-		
-	document.write("max: " + max + " , " + " min: " + min);
-}
-
-
-function initMap(_leafCount, _map, _leaf)
-{
-
-	for (var i=0; i<_leafCount; i++)
-	 	_map[i] =  new Array(10);
-
-	for (var i=0; i<_leafCount; i++)
-	 	_map[i][0] =  _leaf[i];
-
-
-	 for (var i=0; i<_leafCount; i++)
-		for (var j=1; j<10; j++)
-				_map[i][j] = 0 ;
-	 
-	// document.write("Inside initMap");
-}
-
-
-
-function findParent( _leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount )
-{
-	for (var i=0 ; i<_leafCount; i++)
-	{
-		for (var j=0; j<600; j++)
-		{
-				var _diff = compareArrays( _geneticData[ _map[i][0] ], _geneticData[j] ).length;
-			    if( _diff >= _lowerLimit  &&  _diff <= _upperLimit && _map[i][0] != j )
-					{
-						_thisCount++;
-						_map[i][_thisCount] = j ;	
-					}
-		}
-		_thisCount = 0 ;
-	}
-
-	//document.write("Inside findParent");
-}
-
-
-function displayMap(_leafCount, _map)
-{
-	
-	for (var i=0; i<_leafCount; i++)
-	 {
-	 	for (var j=0; j<10; j++)
-	 	{
-	 		document.write(_map[i][j] + " : ");
-	 	}
-	 	document.write("</br>");
-	 }
-	//document.write("Inside displayMap");
-
-	for (var i=0 ; i<_leafCount; i++)
-	{
-		for (var j=0; j<_leafCount; j++)
-		{
-			if(i!=j)
-			{	
-				if(_map[i][1] == _map[j][1])
-				{
-					document.write(_map[i][0] + " : " + _map[j][0] + " ( " + _map[i][1] + " ) " + " , ");
-				}
-			}
-		}
-		document.write("</br>---Next----</br>");
-		_thisCount = 0 ;
-	}
-}
-
-
-
-function relationship(_geneticData)
-{
-
-	document.write("</br>Genetic bit difference between : " + _upperLimit + " & " + _lowerLimit + "</br>");
-	
-	for (var i=0; i<600; i++)
-	{
-		_visited[i] = 0 ;
-		_freq[i] = 0 ;
-	}
-		
-	 _leafCount = calculateDiff (_geneticData, _lowerLimit, _upperLimit, _freq, _leafCount, _leaf, _visited);
-	 document.write("_leafCount: " + _leafCount);
-	
-	//initMap(_leafCount, _map, _leaf);
-	
-	//findParent (_leafCount, _geneticData, _map, _lowerLimit, _upperLimit, _thisCount );
-	
-	//displayMap (_leafCount, _map);	
-	
-}
-
-function toCreateSmallerTweens(_geneticData)
-{
-
-	var _smallTweens =  new Array();
-	var _items = new Array();
-	_items = [0,4,58,208,211,369,447,514];
-
-	for (var i=0; i<_items.length; i++)
-	{
-		_smallTweens[i] = _geneticData[_items[i]];
-	}
-
-	for (var i=0; i<_items.length; i++)
-	{
-		document.write( " _smallTweens [ " + _items[i] + " ] : " + _smallTweens[i] ); 
-	}
-
-}
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-///////--------------------------Differenct Attempt--------------------//////
-/////////////////////////////////////////////////////////////////////////////
-
+var _theParentList = new Array();					//---it stores the parent of that index
+var _diff82 = new Array();							//---it stores the number of different bits in 82nd tween with the rest of the tweens.
+var _toCorrect = 82 ;							
+var _index = 1;
 
 
 function initFunctions(){
@@ -280,6 +104,18 @@ function initFunctions(){
 	 	_freq[i] = 0 ;
 	 	_parentIndex[i]= 0;
 	}
+
+	for(var i=0; i<_genLength; i++){
+		 var _diff = compareArrays(_geneticData[82], _geneticData[i]).length;
+		 _diff82[i] = new Array();
+		 _diff82[i][1] = _diff ;
+		 _diff82[i][0] = i ;
+		}
+	
+	_diff82.sort( function( a, b ){
+		  if ( a[1] == b[1] ) return 0;
+		  return a[1] < b[1] ? -1 : 1;
+		});
 }
 
 function freqSum(){
@@ -289,7 +125,7 @@ function freqSum(){
 }
 
 	
-function initRelatationMap(){
+function initRelationshipMap(){
 	
 	for (var i=0; i< _genLength; i++){
 		_relationshipMap[i] = [];
@@ -298,17 +134,30 @@ function initRelatationMap(){
 			_relationshipMap[i][j] = 0 ;
 		}
 	}
+
+	fillMapWithDiff();
 }
 
 
-function displayRelationshipMap(){
-	for(var i=0; i<_genLength; i++){
-		for(var j=0; j<_genLength+2; j++){
-		   document.write( _relationshipMap[i][j] );
+function toAdjust(){
+	for(var i=1; i<_genLength; i++){
+		for(var j=0; j<_genLength; j++ ){
+			
+			if (_relationshipMap[_toCorrect][j] != 0 ) {
+				if( _diff82[i][0] == j) {
+					_index++;
+				}
+			}
+
 		}
-	document.write( "</br>" );
 	}
+	
+	_relationshipMap[_toCorrect][_diff82[_index][0] ] = _diff82[_index][1];
+	_relationshipMap[_diff82[_index][0] [_toCorrect]] = _diff82[_index][1];
+	_relationshipMap[_toCorrect][_genLengthFreq]++;
+	_relationshipMap[_diff82[_index][0]][_genLengthFreq]++;
 }
+
 
 function fillMapWithDiff()
 {
@@ -323,20 +172,27 @@ function fillMapWithDiff()
 					++_freq[i];
 					_currentParent = j;
 				} 
-		}
+		}		
 		
-		if(_freq[i] == 1)
+		if(_freq[i] == 1){
 			_parentIndex[i] = _currentParent; 	
+			_theParentList[i] = _currentParent;
+		}
 	}
+
+	toAdjust();
 }
+
 
 function refreshParentIndex(){
 	initFunctions();
 	for(var i=0; i<_genLength; i++){
 		if(_relationshipMap[i][_genLengthFreq] == 1){
 			for(var j=0; j<_genLength; j++){
-				if(_relationshipMap[i][j] != 0)
+				if(_relationshipMap[i][j] != 0){
 						_parentIndex[i] = j;
+						_theParentList[i] = j;
+					}
 			}
 		}
 		else
@@ -344,13 +200,12 @@ function refreshParentIndex(){
 	}
 }
 
-function somethingHappens(){
-	document.write("</br></br>");
-	freqSum();
-	document.write("</br>" +  "_freqSum: " + _freqSum + "</br>");
-	displayFreq();
 
-	while(_freqSum > 2 ){
+function toFindParentList(){
+	
+	freqSum();
+	
+	while(_freqSum > 0  ){
 				for (var i=0; i<_genLength; i++){
 
 					if(_relationshipMap[i][_genLengthFreq] == 1){
@@ -368,45 +223,39 @@ function somethingHappens(){
 				}
 				
 				freqSum();
-				document.write("</br>" +  "_freqSum: " + _freqSum + "</br>");
-				displayFreq();
-				--_true ; 
 				refreshParentIndex();
 			}
 }
 
-function displayFreq(){
+//////////-------------Display Functions-----------/////////////
+
+function displayTheParentList(){
 	for(var i=0; i<_genLength; i++){
-		document.write(_relationshipMap[i][_genLengthFreq] + " , ");
-		//document.write(_relationshipMap[i][_genLengthFreq] + " ( " + i + " ) " +  " , ");
+		if(typeof _theParentList[i] == 'undefined')
+			_theParentList[i] = -1 ;
 	}
-	document.write("</br></br>");
+
+	document.write("</br>Child->Parent (Relationship), (-1 = Super Parent)</br></br>");
+	for(var i=0; i<_genLength; i++){
+		document.write(i + " -> " + _theParentList[i] + "</br>");
+	}
 }
 
-function displaySuperParent() {
-	 for(var i=0; i<_genLength; i++){
-	 	if(_relationshipMap[i][_genLengthFreq] != 0)
-	 		document.write("</br></br> SuperParent: " + i + " ( " + _relationshipMap[i][_genLengthFreq] + ")" );
-	 }	
-}
+///////////-----------------Main()---------------//////////////////
 
 function main()
 {
-
 	 initFunctions();		
 	 
-	 initRelatationMap();
+	 initRelationshipMap();
 	 
-	 fillMapWithDiff();
-	 
-	 somethingHappens();
-	 
-	 displaySuperParent();
+	 toFindParentList();
 
-	 return 0;
+	 displayTheParentList();
+	
+	return 0;
 }
 
-main();
 
 
 
