@@ -205,7 +205,7 @@ function toFindParentList(){
 	
 	freqSum();
 	
-	while(_freqSum > 0  ){
+	while(_freqSum > 0 ){
 				for (var i=0; i<_genLength; i++){
 
 					if(_relationshipMap[i][_genLengthFreq] == 1){
@@ -255,16 +255,3 @@ function main()
 	
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
