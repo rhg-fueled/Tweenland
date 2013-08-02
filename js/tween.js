@@ -134,7 +134,7 @@ function toAdjust(){
 	 for(var i=0; i<_toCorrect.length; i++){
 	 	for(var j=0; j<_genLength; j++){
 	 		_diff = compareArrays(_geneticData[_toCorrect[i]], _geneticData[j]).length;
-	 		if(_diff > 147 && _minDiff > _diff){
+	 		if(_diff > _upperLimit && _minDiff > _diff){
 	 				_minDiff = _diff;
 	 				_thisTween = _toCorrect[i];
 	 				_thisParent = j;
