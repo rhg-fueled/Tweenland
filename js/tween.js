@@ -94,9 +94,11 @@ var _parentIndex = new Array();						//---its an array which keeps info about pa
 var _freqSum = 0;									//---it stores the sum of all the number of relatioships at every iteration in toFindParentList() function;
 var _currentParent = 0;
 var _theParentList = new Array();					//---it stores the parent of that index
-var _diff82 = new Array();							//---it stores the number of different bits in 82nd tween with the rest of the tweens.
-var _toCorrect = 82 ;							
+var _toCorrect = [35, 82, 380, 527] ;							
 var _index = 1;
+var _minDiff = 9999 ;
+var _thisTween = 0;
+var _thisParent = 0;
 
 
 function initFunctions(){
@@ -104,18 +106,6 @@ function initFunctions(){
 	 	_freq[i] = 0 ;
 	 	_parentIndex[i]= 0;
 	}
-
-	for(var i=0; i<_genLength; i++){
-		 var _diff = compareArrays(_geneticData[82], _geneticData[i]).length;
-		 _diff82[i] = new Array();
-		 _diff82[i][1] = _diff ;
-		 _diff82[i][0] = i ;
-		}
-	
-	_diff82.sort( function( a, b ){
-		  if ( a[1] == b[1] ) return 0;
-		  return a[1] < b[1] ? -1 : 1;
-		});
 }
 
 function freqSum(){
@@ -140,22 +130,22 @@ function initRelationshipMap(){
 
 
 function toAdjust(){
-	for(var i=1; i<_genLength; i++){
-		for(var j=0; j<_genLength; j++ ){
-			
-			if (_relationshipMap[_toCorrect][j] != 0 ) {
-				if( _diff82[i][0] == j) {
-					_index++;
-				}
-			}
 
-		}
-	}
-	
-	_relationshipMap[_toCorrect][_diff82[_index][0] ] = _diff82[_index][1];
-	_relationshipMap[_diff82[_index][0] [_toCorrect]] = _diff82[_index][1];
-	_relationshipMap[_toCorrect][_genLengthFreq]++;
-	_relationshipMap[_diff82[_index][0]][_genLengthFreq]++;
+	 for(var i=0; i<_toCorrect.length; i++){
+	 	for(var j=0; j<_genLength; j++){
+	 		_diff = compareArrays(_geneticData[_toCorrect[i]], _geneticData[j]).length;
+	 		if(_diff > 147 && _minDiff > _diff){
+	 				_minDiff = _diff;
+	 				_thisTween = _toCorrect[i];
+	 				_thisParent = j;
+	 		}
+	 	}
+	 } 
+
+	_relationshipMap[_thisTween][_thisParent] = _minDiff;
+	_relationshipMap[_thisParent][_thisTween] = _minDiff;
+	_relationshipMap[_thisParent][_genLengthFreq]++;
+	_relationshipMap[_thisTween][_genLengthFreq]++;
 }
 
 
@@ -230,12 +220,15 @@ function toFindParentList(){
 //////////-------------Display Functions-----------/////////////
 
 function displayTheParentList(){
+	var _theParent = 0 ;
 	for(var i=0; i<_genLength; i++){
-		if(typeof _theParentList[i] == 'undefined')
+		if(typeof _theParentList[i] == 'undefined'){
 			_theParentList[i] = -1 ;
+			_theParent = i ;
+		}
 	}
 
-	document.write("</br>Child->Parent (Relationship), (-1 = Super Parent)</br></br>");
+	document.write("</br>Child->Parent (Relationship), " + _theParent + " = Super Parent)</br></br>");
 	for(var i=0; i<_genLength; i++){
 		document.write(i + " -> " + _theParentList[i] + "</br>");
 	}
@@ -248,7 +241,7 @@ function main()
 	 initFunctions();		
 	 
 	 initRelationshipMap();
-	 
+
 	 toFindParentList();
 
 	 displayTheParentList();
